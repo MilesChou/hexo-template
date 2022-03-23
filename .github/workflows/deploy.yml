@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - source
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          submodules: true
+
+      - name: Install
+        uses: borales/actions-yarn@v2.3.0
+        with:
+          cmd: install
+
+      - name: Generate
+        uses: docker://ghcr.io/mileschou/hexo
+        with:
+          args: hexo generate
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.9
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} 
+          branch: master
+          single-commit: true
+          folder: public
+          clean: true
+          clean-exclude: |
+            .nojekyll
